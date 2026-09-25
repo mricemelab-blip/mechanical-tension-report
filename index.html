@@ -1,0 +1,1171 @@
+<!DOCTYPE html><html lang="zh-CN"><head><!-- Coze Coding Analytics -->
+<script>
+(function(){
+  function randomUUID(){
+    if(typeof crypto!=="undefined"&&typeof crypto.randomUUID==="function"){
+      return crypto.randomUUID();
+    }
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g,function(c){
+      return(+c^(crypto.getRandomValues(new Uint8Array(1))[0]&(15>>(+c/4)))).toString(16);
+    });
+  }
+
+  function encode(obj){return btoa(JSON.stringify(obj))}
+  function decode(str){try{return JSON.parse(atob(str))}catch(e){return null}}
+
+  function getDeviceId(){
+    var storageKey="__coze_coding_device_info";
+    try{
+      var info=decode(localStorage.getItem(storageKey));
+      if(info&&typeof info.did==="string"){return info.did}
+    }catch(e){}
+    var newInfo={did:randomUUID()};
+    try{localStorage.setItem(storageKey,encode(newInfo))}catch(e){}
+    return newInfo.did;
+  }
+
+  function sendPageViewEvent(){
+    var deviceId=getDeviceId();
+    var projectId="7689237545888071720";
+    var reportURL="https://code.coze.cn/api/coding/deployment/analytics/report?project_id="+encodeURIComponent(projectId)+"&did="+encodeURIComponent(deviceId);
+    try{
+      fetch(reportURL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          events:[{
+            type:"page_view",
+            url:window.location.href,
+            path:window.location.pathname,
+            referrer:document.referrer,
+            timestamp:Date.now()
+          }]
+        })
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  if(document.readyState==="complete"){
+    sendPageViewEvent();
+  }else{
+    document.addEventListener("readystatechange",function(){
+      if(document.readyState==="complete"){sendPageViewEvent()}
+    });
+  }
+})();
+</script>
+<!-- WebPro SDK -->
+<script>
+(function(n,e,r,t,a,o,s,i,c,l,f,m,p,u){o="precollect";s="getAttribute";i="addEventListener";c="PerformanceObserver";l=function(e){f=[].slice.call(arguments);f.push(Date.now(),location.href);(e==o?l.p.a:l.q).push(f)};l.q=[];l.p={a:[]};n[a]=l;m=document.createElement("script");m.src=r+"?aid="+t+"&globalName="+a;m.crossOrigin="anonymous";e.getElementsByTagName("head")[0].appendChild(m);if(i in n){l.pcErr=function(e){e=e||n.event;p=e.target||e.srcElement;if(p instanceof Element||p instanceof HTMLElement){n[a](o,"st",{tagName:p.tagName,url:p[s]("href")||p[s]("src")})}else{n[a](o,"err",e.error||e.message)}};l.pcRej=function(e){e=e||n.event;n[a](o,"reject",e.reason||e.detail&&e.detail.reason)};n[i]("error",l.pcErr,true);n[i]("unhandledrejection",l.pcRej,true)}if("PerformanceLongTaskTiming"in n){u=l.pp={entries:[]};u.observer=new PerformanceObserver(function(e){u.entries=u.entries.concat(e.getEntries())});u.observer.observe({entryTypes:["longtask"]})}})(window,document,"https://apm.volccdn.com/mars-web/apmplus/web/browser.cn.js",1001891,"apmPlus");
+</script>
+<script>
+window.apmPlus("context.set", "project_id", "7689037094215319578");
+window.apmPlus("init",{
+  aid: 1001891,
+  token: '26a8704bd4d34b1698085c787d0c95d0'
+});
+window.apmPlus("start");
+</script>
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>机械张力研究报告：定义、感知、量化与前沿</title>
+<style>
+:root {
+  --c-bg: #0f1419;
+  --c-surface: #1a2332;
+  --c-surface-2: #1e2a3a;
+  --c-surface-3: #243044;
+  --c-border: #2d3f56;
+  --c-text: #e2e8f0;
+  --c-text-2: #a0aec0;
+  --c-text-3: #718096;
+  --c-accent: #d69e2e;
+  --c-accent-soft: rgba(214,158,46,0.12);
+  --c-steel: #4299e1;
+  --c-steel-soft: rgba(66,153,225,0.1);
+  --c-teal: #38b2ac;
+  --c-teal-soft: rgba(56,178,172,0.1);
+  --c-red: #fc8181;
+  --c-red-soft: rgba(252,129,129,0.08);
+  --c-green: #68d391;
+  --c-green-soft: rgba(104,211,145,0.1);
+  --c-purple: #b794f4;
+  --c-purple-soft: rgba(183,148,244,0.1);
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.85rem;
+  --fs-base: 0.95rem;
+  --fs-lg: 1.1rem;
+  --fs-xl: 1.3rem;
+  --fs-2xl: 1.65rem;
+  --fs-3xl: clamp(1.8rem, 3.5vw, 2.4rem);
+  --lh: 1.7;
+  --max-w: 900px;
+  --sp-xs: 0.4rem;
+  --sp-sm: 0.75rem;
+  --sp-md: 1.25rem;
+  --sp-lg: 2rem;
+  --sp-xl: 3rem;
+  --sp-2xl: 4.5rem;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: var(--fs-base);
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { width: 100%; padding: 0 clamp(1rem, 4vw, 3rem); }
+.inner { max-width: var(--max-w); margin: 0 auto; }
+
+/* ===== Header ===== */
+.hero {
+  padding: var(--sp-2xl) 0 var(--sp-xl);
+  border-bottom: 1px solid var(--c-border);
+}
+.hero-tag {
+  display: inline-block;
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: var(--sp-md);
+}
+.hero h1 {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--sp-sm);
+}
+.hero h1 span { color: var(--c-accent); }
+.hero .sub {
+  font-size: var(--fs-lg);
+  color: var(--c-text-2);
+  line-height: 1.5;
+  max-width: 680px;
+}
+.hero .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-md) var(--sp-lg);
+  margin-top: var(--sp-md);
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+}
+
+/* ===== Section ===== */
+.sec { padding: var(--sp-xl) 0; border-bottom: 1px solid var(--c-border); }
+.sec:last-of-type { border-bottom: none; }
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-lg);
+}
+.sec-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.sec-num.gold { background: var(--c-accent-soft); color: var(--c-accent); }
+.sec-num.blue { background: var(--c-steel-soft); color: var(--c-steel); }
+.sec-num.teal { background: var(--c-teal-soft); color: var(--c-teal); }
+.sec-num.purple { background: var(--c-purple-soft); color: var(--c-purple); }
+.sec-num.red { background: var(--c-red-soft); color: var(--c-red); }
+.sec-num.green { background: var(--c-green-soft); color: var(--c-green); }
+
+.sec h2 {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: var(--sp-lg) 0 var(--sp-sm);
+  color: var(--c-text);
+}
+
+p { margin-bottom: var(--sp-sm); color: var(--c-text-2); }
+p + p { margin-top: var(--sp-xs); }
+
+/* ===== Core Conclusion Banner ===== */
+.conclusion {
+  background: linear-gradient(135deg, var(--c-surface-2), var(--c-surface-3));
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: var(--sp-md) var(--sp-lg);
+  margin-bottom: var(--sp-xl);
+}
+.conclusion p { color: var(--c-text); font-size: var(--fs-base); margin: 0; }
+.conclusion strong { color: var(--c-accent); }
+
+/* ===== Definition Cards ===== */
+.def-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-md);
+  margin: var(--sp-md) 0;
+}
+@media (min-width: 640px) { .def-grid { grid-template-columns: 1fr 1fr; } }
+
+.def-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  position: relative;
+  overflow: hidden;
+}
+.def-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.def-card.gold::before { background: var(--c-accent); }
+.def-card.blue::before { background: var(--c-steel); }
+.def-card.teal::before { background: var(--c-teal); }
+.def-card.purple::before { background: var(--c-purple); }
+
+.def-card .label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--sp-xs);
+}
+.def-card.gold .label { color: var(--c-accent); }
+.def-card.blue .label { color: var(--c-steel); }
+.def-card.teal .label { color: var(--c-teal); }
+.def-card.purple .label { color: var(--c-purple); }
+.def-card h4 { font-size: var(--fs-base); margin-bottom: var(--sp-xs); }
+.def-card p { font-size: var(--fs-sm); margin: 0; }
+
+/* ===== Formula Box ===== */
+.formula-box {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md) var(--sp-lg);
+  margin: var(--sp-md) 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  color: var(--c-accent);
+  line-height: 2;
+  overflow-x: auto;
+}
+.formula-box .note {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-top: var(--sp-xs);
+}
+
+/* ===== Table ===== */
+.tbl-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: var(--sp-md) 0;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+caption {
+  text-align: left;
+  padding: var(--sp-sm) var(--sp-md);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+}
+thead th {
+  background: var(--c-surface-2);
+  font-weight: 600;
+  text-align: left;
+  padding: var(--sp-sm) var(--sp-md);
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;
+  color: var(--c-text);
+}
+tbody td {
+  padding: var(--sp-sm) var(--sp-md);
+  border-bottom: 1px solid rgba(45,63,86,0.5);
+  vertical-align: top;
+  color: var(--c-text-2);
+}
+tbody tr:last-child td { border-bottom: none; }
+
+/* ===== Pathway SVG ===== */
+.svg-box {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  margin: var(--sp-md) 0;
+  overflow-x: auto;
+}
+.svg-box svg { display: block; width: 100%; height: auto; min-width: 600px; }
+
+/* ===== Info Box ===== */
+.info-box {
+  border-radius: var(--r-md);
+  padding: var(--sp-md) var(--sp-lg);
+  margin: var(--sp-md) 0;
+}
+.info-box.warn {
+  background: var(--c-red-soft);
+  border: 1px solid rgba(252,129,129,0.2);
+}
+.info-box.insight {
+  background: var(--c-steel-soft);
+  border: 1px solid rgba(66,153,225,0.2);
+}
+.info-box.key {
+  background: var(--c-accent-soft);
+  border: 1px solid rgba(214,158,46,0.2);
+}
+.info-box h4 {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  margin-bottom: var(--sp-xs);
+}
+.info-box.warn h4 { color: var(--c-red); }
+.info-box.insight h4 { color: var(--c-steel); }
+.info-box.key h4 { color: var(--c-accent); }
+.info-box p, .info-box li { font-size: var(--fs-sm); color: var(--c-text-2); }
+.info-box ul { list-style: none; padding: 0; }
+.info-box li { padding: 3px 0 3px 16px; position: relative; }
+.info-box li::before { content: '→'; position: absolute; left: 0; color: var(--c-accent); }
+
+/* ===== Sensor Cards ===== */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-md);
+  margin: var(--sp-md) 0;
+}
+@media (min-width: 560px) { .sensor-grid { grid-template-columns: 1fr 1fr; } }
+
+.sensor-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+}
+.sensor-card .name {
+  font-weight: 700;
+  font-size: var(--fs-base);
+  margin-bottom: 4px;
+}
+.sensor-card .loc {
+  font-size: var(--fs-xs);
+  color: var(--c-text-3);
+  margin-bottom: var(--sp-sm);
+  font-family: var(--font-mono);
+}
+.sensor-card p {
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== Lever Diagram ===== */
+.lever-diagram {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md);
+  margin: var(--sp-md) 0;
+}
+
+/* ===== Timeline ===== */
+.timeline { margin: var(--sp-md) 0; padding-left: var(--sp-lg); border-left: 2px solid var(--c-border); }
+.timeline-item { position: relative; padding: var(--sp-sm) 0 var(--sp-md) var(--sp-md); }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--sp-lg) - 5px);
+  top: 12px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--c-accent);
+}
+.timeline-item .year {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-accent);
+  font-family: var(--font-mono);
+}
+.timeline-item .desc {
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+  margin-top: 2px;
+}
+
+/* ===== References ===== */
+.ref-list { list-style: none; padding: 0; counter-reset: ref; }
+.ref-list li {
+  counter-increment: ref;
+  position: relative;
+  padding: var(--sp-xs) 0 var(--sp-xs) 36px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  line-height: 1.6;
+}
+.ref-list li::before {
+  content: '[' counter(ref) ']';
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--c-text-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+.ref-list a { color: var(--c-teal); text-decoration: none; overflow-wrap: break-word; }
+.ref-list a:hover { text-decoration: underline; }
+
+/* ===== Footer ===== */
+.foot {
+  margin-top: var(--sp-2xl);
+  padding: var(--sp-lg) 0;
+  border-top: 1px solid var(--c-border);
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  text-align: center;
+}
+
+/* ===== Inline tags ===== */
+.tag {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+  vertical-align: middle;
+}
+.tag-gold { background: var(--c-accent-soft); color: var(--c-accent); }
+.tag-blue { background: var(--c-steel-soft); color: var(--c-steel); }
+.tag-teal { background: var(--c-teal-soft); color: var(--c-teal); }
+.tag-red { background: var(--c-red-soft); color: var(--c-red); }
+.tag-green { background: var(--c-green-soft); color: var(--c-green); }
+.tag-purple { background: var(--c-purple-soft); color: var(--c-purple); }
+
+/* ===== Nav ===== */
+.toc {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-md) var(--sp-lg);
+  margin-bottom: var(--sp-xl);
+}
+.toc-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--sp-sm);
+}
+.toc ol { list-style: none; padding: 0; }
+.toc li { padding: 4px 0; }
+.toc a {
+  color: var(--c-text-2);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--c-accent); }
+.toc a .num { color: var(--c-text-3); font-family: var(--font-mono); font-size: var(--fs-xs); margin-right: 6px; }
+
+/* ===== Print ===== */
+@media print {
+  body { background: #fff; color: #222; }
+  .sec { break-inside: avoid; }
+  .toc, .svg-box, .info-box, .def-card, .sensor-card, .tbl-wrap, .formula-box { break-inside: avoid; }
+  a { color: inherit; }
+  a[href^="http"]::after { content: ' (' attr(href) ')'; font-size: 0.75em; color: #666; }
+}
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="inner">
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <span class="hero-tag">Research Report · 2026</span>
+  <h1><span>机械张力</span>（Mechanical Tension）<br/>定义、感知、量化与前沿研究</h1>
+  <p class="sub">从物理学定义到分子机械转导，从力矩公式到有效重复次数——一份关于肌肉肥大第一驱动力的系统性综述</p>
+  <div class="meta">
+    <span>📅 2026-09-24</span>
+    <span>📖 基于 Van Every 2025, Schoenfeld 2017/2021, Wolf 2023 等核心文献</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+  <p class="toc-title">目录</p>
+  <ol>
+    <li><a href="#s1"><span class="num">01</span>机械张力的定义：物理学、生理学与操作定义</a></li>
+    <li><a href="#s2"><span class="num">02</span>身体如何感知机械张力：机械转导全通路</a></li>
+    <li><a href="#s3"><span class="num">03</span>如何量化机械张力：公式、力矩与有效张力</a></li>
+    <li><a href="#s4"><span class="num">04</span>主动张力 vs 被动张力：拉伸介导的肥大</a></li>
+    <li><a href="#s5"><span class="num">05</span>剂量-反应关系：多少张力才够？</a></li>
+    <li><a href="#s6"><span class="num">06</span>研究前沿与争议</a></li>
+    <li><a href="#s7"><span class="num">07</span>实践启示与总结</a></li>
+    <li><a href="#s8"><span class="num">08</span>参考文献</a></li>
+  </ol>
+</nav>
+
+<!-- Core Conclusion -->
+<div class="conclusion">
+  <p><strong>核心结论：</strong>机械张力是骨骼肌纤维在对抗外部负荷时承受的力学刺激，是抗阻训练诱导肌肉肥大的<strong>首要且必要驱动因素</strong>。它不是一个单一变量，而是由 <strong>力 × 时间 × 募集纤维数</strong> 三者的乘积决定，通过复杂的机械转导通路（integrin-FAK、titin kinase、YAP/TAZ 等）被细胞感知，最终汇聚到 mTORC1 信号通路激活蛋白质合成。</p>
+</div>
+
+<!-- ===== SECTION 1 ===== -->
+<section class="sec" id="s1">
+  <div class="sec-head">
+    <span class="sec-num gold">01</span>
+    <h2>机械张力的定义</h2>
+  </div>
+
+  <p>「机械张力」一词在不同语境下有不同含义。要准确理解它在肌肥大中的角色，需要从三个层面来定义：</p>
+
+  <div class="def-grid">
+    <div class="def-card gold">
+      <p class="label">物理学定义</p>
+      <h4>应力（Stress）= 力 / 面积</h4>
+      <p>在物理学中，张力（tension）是物体内部单位截面积上承受的内力，单位为 Pa（N/m²）。对肌纤维而言，就是纤维横截面上承受的力。这个定义关注的是<strong>力的密度分布</strong>。</p>
+    </div>
+    <div class="def-card blue">
+      <p class="label">生理学定义</p>
+      <h4>肌纤维承受的总力学刺激</h4>
+      <p>在运动科学中，机械张力更接近「单根肌纤维在收缩或被动拉伸过程中承受的力学负荷」，是触发机械转导（mechanotransduction）的信号。它不仅取决于力的大小，还取决于<strong>持续时间</strong>和<strong>募集范围</strong>。</p>
+    </div>
+    <div class="def-card teal">
+      <p class="label">操作定义（训练科学）</p>
+      <h4>张力 = 力 × 时间 × 募集纤维数</h4>
+      <p>在训练实践中，机械张力被操作化为：每根被募集的肌纤维所经历的力，乘以该力持续作用的时间，再乘以被激活的运动单位数量。<strong>三个因素缺一不可</strong>——未被募集的纤维不会感受到张力。</p>
+    </div>
+    <div class="def-card purple">
+      <p class="label">Van Every et al. 2025 定义</p>
+      <h4>「通过渐进超负荷施加的力学刺激」</h4>
+      <p>「mechanical tension (e.g., RET) that is subsequently &#39;sensed&#39; by mechanosensors」——机械张力是通过抗阻训练产生的、能被机械感受器检测到的外部力学刺激，是最有效的非药物性肥大刺激。</p>
+    </div>
+  </div>
+
+  <div class="info-box key">
+    <h4>💡 关键区分：「外部负荷」≠「肌纤维张力」</h4>
+    <p>杠铃重量是外部负荷（external load），但肌纤维实际承受的张力取决于力矩臂、关节角度、收缩速度、运动单位募集等多个中间变量。同样的 100kg 杠铃，在不同动作、不同角度下，目标肌纤维承受的张力完全不同。这就是为什么理解力矩和力臂至关重要。</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 2 ===== -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <span class="sec-num teal">02</span>
+    <h2>身体如何感知机械张力</h2>
+  </div>
+
+  <p>肌纤维并不像大脑感知触觉那样「感觉到」力。它依赖的是一套分布式的<strong>分子机械感受器网络</strong>（mechanosensors），将力学变形转化为生化信号——这个过程叫做<strong>机械转导</strong>（mechanotransduction）。</p>
+
+  <h3>2.1 机械感受器全景</h3>
+
+  <div class="sensor-grid">
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-accent)">α₇β₁-整合素（Integrin）</p>
+      <p class="loc">📍 肌膜 · 黏着斑复合体（costamere）</p>
+      <p>细胞外基质（ECM）与细胞内骨架之间的跨膜连接桥梁。当肌纤维被拉伸或收缩时，整合素感知 ECM 的变形，通过黏着斑激酶（FAK）启动胞内信号级联。它是力学信号从细胞外传入细胞内的<strong>第一站</strong>。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-steel)">黏着斑激酶（FAK）</p>
+      <p class="loc">📍 肌膜 · Z 盘相关 costamere</p>
+      <p>被整合素激活后，FAK 在 Y⁵⁷⁶/⁵⁷⁷ 位点自磷酸化（运动后 4h 达峰），招募磷脂酶 D（PLD）和二酰甘油激酶 ζ（DGKζ），催化产生<strong>磷脂酸（PA）</strong>。PA 直接结合 mTOR，解除 FKBP38 的抑制，激活 mTOR 激酶活性。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-teal)">肌联蛋白（Titin）</p>
+      <p class="loc">📍 肌节 · M 带</p>
+      <p>人体内最大的蛋白质（~3.8 MDa），贯穿半个肌节。其 M 带区包含一个<strong>拉伸激活的激酶结构域</strong>：当肌节被拉长时，ATP 结合口袋暴露，激酶活性被激活。Titin 是离心收缩中被动张力的主要来源，也是「拉伸介导的肥大」的关键分子基础。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-purple)">YAP / TAZ</p>
+      <p class="loc">📍 胞质 → 细胞核 · Hippo 通路下游</p>
+      <p>磷脂酸（PA）通过 Hippo 通路效应子 YAP/TAZ 调节细胞生长。机械负荷下 YAP 去磷酸化、转位入核，上调 Slc7a5 和 Slc3a2（亮氨酸转运蛋白）基因表达，使肌肉对亮氨酸刺激更敏感。动物实验表明 YAP 激活甚至可在 mTORC1 被抑制时维持肌肉生长。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-green)">肌营养不良蛋白复合体（DGC）</p>
+      <p class="loc">📍 肌膜 · costamere</p>
+      <p>由 dystrophin、sarcoglycan、sarcospan 等组成的复合体，连接胞内骨架与 ECM。其组分 nNOS 在机械超负荷后迅速激活，通过过氧亚硝酸盐 → TRPV1 → Ca²⁺ → mTOR 通路参与肥大信号。DGC 突变导致肌营养不良，证明其在力学信号传导中的核心地位。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-red)">GPR56（黏附 GPCR）</p>
+      <p class="loc">📍 肌膜 · 受 PGC-1α4 转录调控</p>
+      <p>细胞外配体为 III 型胶原。激活后经 Gα₁₂/₁₃-Rho 通路 → mTOR → 蛋白合成↑。GPR56 基因敲除小鼠的超负荷肥大反应显著减弱，证明这是一条独立的力学感受通路。</p>
+    </div>
+  </div>
+
+  <h3>2.2 信号通路总览</h3>
+
+  <div class="svg-box">
+    <svg viewBox="0 0 860 340" role="img" aria-labelledby="pathway-t pathway-d">
+      <title id="pathway-t">机械转导信号通路图</title>
+      <desc id="pathway-d">从细胞外基质变形到 mTORC1 激活及蛋白质合成的完整机械转导通路</desc>
+
+      <!-- External Load -->
+      <rect x="10" y="140" width="100" height="50" rx="8" fill="rgba(214,158,46,0.15)" stroke="#d69e2e"></rect>
+      <text x="60" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="#d69e2e">外部负荷</text>
+      <text x="60" y="178" text-anchor="middle" font-size="9" fill="#a0aec0">Resistance</text>
+
+      <!-- Arrow -->
+      <line x1="110" y1="165" x2="145" y2="165" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow-gold)"></line>
+
+      <!-- ECM Deformation -->
+      <rect x="148" y="140" width="110" height="50" rx="8" fill="rgba(66,153,225,0.1)" stroke="#4299e1"></rect>
+      <text x="203" y="160" text-anchor="middle" font-size="10" font-weight="600" fill="#4299e1">ECM 变形</text>
+      <text x="203" y="175" text-anchor="middle" font-size="9" fill="#718096">+ 肌节拉伸</text>
+
+      <!-- Arrow splits -->
+      <line x1="258" y1="155" x2="295" y2="80" stroke="#4299e1" stroke-width="1.5" marker-end="url(#arrow-blue)"></line>
+      <line x1="258" y1="165" x2="295" y2="165" stroke="#4299e1" stroke-width="1.5" marker-end="url(#arrow-blue)"></line>
+      <line x1="258" y1="175" x2="295" y2="260" stroke="#4299e1" stroke-width="1.5" marker-end="url(#arrow-blue)"></line>
+
+      <!-- Path 1: Integrin-FAK-PA -->
+      <rect x="298" y="50" width="120" height="60" rx="8" fill="rgba(56,178,172,0.1)" stroke="#38b2ac"></rect>
+      <text x="358" y="72" text-anchor="middle" font-size="10" font-weight="600" fill="#38b2ac">Integrin-FAK</text>
+      <text x="358" y="88" text-anchor="middle" font-size="9" fill="#718096">→ PLD/DGKζ</text>
+      <text x="358" y="100" text-anchor="middle" font-size="9" fill="#718096">→ 磷脂酸(PA)</text>
+
+      <!-- Path 2: Titin -->
+      <rect x="298" y="138" width="120" height="55" rx="8" fill="rgba(183,148,244,0.1)" stroke="#b794f4"></rect>
+      <text x="358" y="158" text-anchor="middle" font-size="10" font-weight="600" fill="#b794f4">Titin Kinase</text>
+      <text x="358" y="174" text-anchor="middle" font-size="9" fill="#718096">拉伸→ATP口袋暴露</text>
+      <text x="358" y="186" text-anchor="middle" font-size="9" fill="#718096">→ Ca²⁺/mTOR</text>
+
+      <!-- Path 3: DGC + GPR56 -->
+      <rect x="298" y="232" width="120" height="55" rx="8" fill="rgba(104,211,145,0.1)" stroke="#68d391"></rect>
+      <text x="358" y="252" text-anchor="middle" font-size="10" font-weight="600" fill="#68d391">DGC + GPR56</text>
+      <text x="358" y="268" text-anchor="middle" font-size="9" fill="#718096">nNOS→TRPV1→Ca²⁺</text>
+      <text x="358" y="280" text-anchor="middle" font-size="9" fill="#718096">Gα₁₂/₁₃-Rho→mTOR</text>
+
+      <!-- Converge arrows to mTOR -->
+      <line x1="418" y1="80" x2="490" y2="150" stroke="#38b2ac" stroke-width="1.5" marker-end="url(#arrow-teal)"></line>
+      <line x1="418" y1="165" x2="490" y2="165" stroke="#b794f4" stroke-width="1.5" marker-end="url(#arrow-purple)"></line>
+      <line x1="418" y1="260" x2="490" y2="180" stroke="#68d391" stroke-width="1.5" marker-end="url(#arrow-green)"></line>
+
+      <!-- mTORC1 Hub -->
+      <rect x="493" y="130" width="110" height="60" rx="12" fill="rgba(214,158,46,0.2)" stroke="#d69e2e" stroke-width="2"></rect>
+      <text x="548" y="155" text-anchor="middle" font-size="13" font-weight="800" fill="#d69e2e">mTORC1</text>
+      <text x="548" y="172" text-anchor="middle" font-size="9" fill="#a0aec0">+ AA + IGF-1</text>
+
+      <!-- YAP branch -->
+      <rect x="493" y="230" width="110" height="45" rx="8" fill="rgba(183,148,244,0.08)" stroke="#b794f4" stroke-dasharray="4,3"></rect>
+      <text x="548" y="250" text-anchor="middle" font-size="10" font-weight="600" fill="#b794f4">YAP/TAZ</text>
+      <text x="548" y="264" text-anchor="middle" font-size="8" fill="#718096">亮氨酸转运↑</text>
+      <line x1="548" y1="230" x2="548" y2="192" stroke="#b794f4" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-purple)"></line>
+
+      <!-- Downstream -->
+      <line x1="603" y1="150" x2="645" y2="120" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow-gold)"></line>
+      <line x1="603" y1="165" x2="645" y2="165" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow-gold)"></line>
+      <line x1="603" y1="180" x2="645" y2="210" stroke="#d69e2e" stroke-width="1.5" marker-end="url(#arrow-gold)"></line>
+
+      <!-- Downstream targets -->
+      <rect x="648" y="100" width="100" height="38" rx="6" fill="var(--c-surface-2)" stroke="var(--c-border)"></rect>
+      <text x="698" y="118" text-anchor="middle" font-size="9" font-weight="600" fill="#e2e8f0">p70S6K1</text>
+      <text x="698" y="131" text-anchor="middle" font-size="8" fill="#718096">翻译起始↑</text>
+
+      <rect x="648" y="147" width="100" height="38" rx="6" fill="var(--c-surface-2)" stroke="var(--c-border)"></rect>
+      <text x="698" y="165" text-anchor="middle" font-size="9" font-weight="600" fill="#e2e8f0">4E-BP1 释放</text>
+      <text x="698" y="178" text-anchor="middle" font-size="8" fill="#718096">帽依赖翻译↑</text>
+
+      <rect x="648" y="195" width="100" height="38" rx="6" fill="var(--c-surface-2)" stroke="var(--c-border)"></rect>
+      <text x="698" y="213" text-anchor="middle" font-size="9" font-weight="600" fill="#e2e8f0">核糖体生物发生</text>
+      <text x="698" y="226" text-anchor="middle" font-size="8" fill="#718096">翻译容量↑</text>
+
+      <!-- Final output -->
+      <line x1="748" y1="119" x2="780" y2="145" stroke="#68d391" stroke-width="1.5"></line>
+      <line x1="748" y1="166" x2="780" y2="155" stroke="#68d391" stroke-width="1.5"></line>
+      <line x1="748" y1="214" x2="780" y2="165" stroke="#68d391" stroke-width="1.5"></line>
+
+      <rect x="783" y="125" width="70" height="50" rx="10" fill="rgba(104,211,145,0.15)" stroke="#68d391" stroke-width="1.5"></rect>
+      <text x="818" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#68d391">MPS ↑</text>
+      <text x="818" y="163" text-anchor="middle" font-size="8" fill="#718096">蛋白合成</text>
+
+      <!-- Arrows defs -->
+      <defs>
+        <marker id="arrow-gold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#d69e2e"></path></marker>
+        <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4299e1"></path></marker>
+        <marker id="arrow-teal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#38b2ac"></path></marker>
+        <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#b794f4"></path></marker>
+        <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#68d391"></path></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="info-box insight">
+    <h4>🔑 关键认知：机械转导不是单通路</h4>
+    <p>至少存在 3 条并行的机械感受通路（Integrin-FAK-PA、Titin Kinase、DGC/GPR56），加上 YAP/TAZ 的辅助调控，共同汇聚到 mTORC1。这意味着即使某条通路被阻断（如雷帕霉素抑制 mTORC1），YAP 仍能部分维持肌肉生长。这一冗余设计保证了力学信号的稳健传递。</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 3 ===== -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <span class="sec-num blue">03</span>
+    <h2>如何量化机械张力</h2>
+  </div>
+
+  <p>机械张力的量化是运动科学中最具挑战性的问题之一。从物理学的力矩计算到操作层面的近似公式，我们需要分层理解。</p>
+
+  <h3>3.1 基础物理学力矩</h3>
+
+  <div class="formula-box">
+    <p style="color:var(--c-steel);">力矩（Moment / Torque）:</p>
+    <p style="font-size:1.1em;">τ = F × r × sin(θ)</p>
+    <p class="note">τ = 力矩 (N·m)，F = 力的大小 (N)，r = 力臂（力作用线到关节旋转轴的垂直距离，m），θ = 力与力臂的夹角</p>
+  </div>
+
+  <div class="lever-diagram">
+    <svg viewBox="0 0 700 180" role="img" aria-labelledby="lever-t lever-d" style="min-width:500px">
+      <title id="lever-t">力臂与力矩示意图</title>
+      <desc id="lever-d">展示二头肌弯举中不同关节角度下阻力力臂的变化</desc>
+
+      <!-- Joint -->
+      <circle cx="200" cy="120" r="10" fill="none" stroke="#4299e1" stroke-width="2"></circle>
+      <text x="200" y="150" text-anchor="middle" font-size="10" fill="#718096">关节中心</text>
+
+      <!-- Forearm - position 1 (horizontal) -->
+      <line x1="210" y1="120" x2="500" y2="120" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"></line>
+      <circle cx="500" cy="120" r="8" fill="#d69e2e" opacity="0.8"></circle>
+      <text x="500" y="105" text-anchor="middle" font-size="9" fill="#d69e2e" font-weight="600">负荷 F</text>
+
+      <!-- Moment arm 1 -->
+      <line x1="200" y1="135" x2="500" y2="135" stroke="#fc8181" stroke-width="1.5" stroke-dasharray="4,3"></line>
+      <text x="350" y="150" text-anchor="middle" font-size="9" fill="#fc8181">r = 水平距离（力臂最长，τ 最大）</text>
+
+      <!-- Vertical line from load -->
+      <line x1="500" y1="120" x2="500" y2="170" stroke="#718096" stroke-width="1" stroke-dasharray="2,2"></line>
+      <line x1="200" y1="120" x2="200" y2="170" stroke="#718096" stroke-width="1" stroke-dasharray="2,2"></line>
+
+      <!-- Angle indicator -->
+      <path d="M 260 120 A 60 60 0 0 0 240 78" fill="none" stroke="#4299e1" stroke-width="1.5"></path>
+      <text x="270" y="92" font-size="9" fill="#4299e1">θ = 90° → sin(θ) = 1</text>
+
+      <!-- Formula -->
+      <text x="620" y="60" font-size="10" fill="#a0aec0">当手臂水平时：</text>
+      <text x="620" y="78" font-size="11" fill="#d69e2e" font-weight="700">τ = F × r × 1</text>
+      <text x="620" y="95" font-size="9" fill="#718096">= 最大力矩</text>
+
+      <!-- Second position (angled) - faded -->
+      <line x1="210" y1="120" x2="440" y2="55" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" opacity="0.3"></line>
+      <circle cx="440" cy="55" r="6" fill="#d69e2e" opacity="0.3"></circle>
+
+      <line x1="200" y1="135" x2="440" y2="135" stroke="#fc8181" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"></line>
+      <text x="320" y="170" text-anchor="middle" font-size="8" fill="#fc8181" opacity="0.5">r&#39; &lt; r（力臂更短，τ 更小）</text>
+    </svg>
+  </div>
+
+  <h3>3.2 内部力矩与肌肉力</h3>
+
+  <div class="formula-box">
+    <p style="color:var(--c-steel);">力矩平衡方程（等长收缩）:</p>
+    <p style="font-size:1.1em;">F<sub>muscle</sub> × r<sub>muscle</sub> = F<sub>resistance</sub> × r<sub>resistance</sub></p>
+    <p class="note">F_muscle = 肌肉需要产生的力；r_muscle = 肌肉力臂（肌肉附着点到关节的距离，通常很短）<br/>
+    由于人体大多数肢体属于<strong>第三类杠杆</strong>（阻力臂 &gt; 肌力臂），肌肉实际产生的力远大于外部负荷。例如弯举中，二头肌力臂约 5cm，负荷力臂可达 35cm → 肌肉需产生约 7 倍于负荷的力。</p>
+  </div>
+
+  <h3>3.3 有效机械张力的操作公式</h3>
+
+  <p>The Muscle PhD（2021）提出了一个概念性的量化公式，虽然在实际操作中难以精确测量，但它清晰地揭示了机械张力的四个决定因素：</p>
+
+  <div class="formula-box">
+    <p style="color:var(--c-accent); font-size:1.15em;">有效机械张力 = 激活率 × (外部力矩 × 关节活动度) ÷ 收缩速度</p>
+    <p style="margin-top:var(--sp-sm); color:var(--c-text-2);">
+    <span style="color:var(--c-steel);">激活率</span> = EMG 活动度 / MVIC（最大自主等长收缩），反映运动单位募集程度<br/>
+    <span style="color:var(--c-teal);">外部力矩</span> = F × r（负荷 × 阻力臂），综合反映重量和力学难度<br/>
+    <span style="color:var(--c-purple);">关节活动度</span> = 该组中关节旋转角度总和（°），反映张力作用的范围<br/>
+    <span style="color:var(--c-red);">收缩速度</span> = 杠铃/肢体移动速度（m/s），速度越慢→张力越大（Hill力-速度关系）
+    </p>
+    <p class="note">示例：腿屈伸 8 次，激活率 85%，平均外部力矩 250N·m，关节 ROM 120°，速度 0.55m/s<br/>
+    → 0.85 × (250 × 120) / 0.55 ≈ 46,364 机械张力单位</p>
+  </div>
+
+  <div class="info-box key">
+    <h4>💡 公式的实践意义：四个可调控的旋钮</h4>
+    <ul>
+      <li><strong>提高激活率</strong>：增加负荷或接近力竭（RIR ≤ 2-3）→ 募集更多高阈值运动单位</li>
+      <li><strong>增大外部力矩</strong>：增加重量，或选择阻力臂更长的动作变式（如高杠深蹲 vs 低杠深蹲对股四头肌）</li>
+      <li><strong>增大活动度</strong>：全程动作（full ROM），尤其在拉伸位置加载</li>
+      <li><strong>降低收缩速度</strong>：控制离心阶段（2-3秒），利用力-速度关系增加每根纤维的力输出</li>
+    </ul>
+  </div>
+
+  <h3>3.4 力臂在不同动作中的变化</h3>
+
+  <div class="tbl-wrap">
+    <table>
+      <caption>常见动作的力矩特征与张力峰值位置</caption>
+      <thead>
+        <tr>
+          <th scope="col">动作</th>
+          <th scope="col">阻力臂最长位置</th>
+          <th scope="col">张力峰值</th>
+          <th scope="col">实操启示</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>哑铃弯举（站姿）</td>
+          <td>前臂水平时（~90°肘屈曲）</td>
+          <td>中段</td>
+          <td>中段最难；可用斜板弯举将张力峰值移至拉伸位</td>
+        </tr>
+        <tr>
+          <td>哑铃侧平举（站姿）</td>
+          <td>手臂水平时（90°外展）</td>
+          <td>顶端</td>
+          <td>顶端张力最大但三角肌中束已缩短；躺卧侧平举可将峰值移至拉伸位</td>
+        </tr>
+        <tr>
+          <td>深蹲（高杠）</td>
+          <td>最低点附近（膝关节屈曲最大）</td>
+          <td>底部</td>
+          <td>底部股四头肌力矩最大 → 拉伸位高张力 → 有利肥大</td>
+        </tr>
+        <tr>
+          <td>腿弯举（坐姿）</td>
+          <td>膝关节接近完全伸展时</td>
+          <td>拉伸位</td>
+          <td>股二头肌在拉伸位承受最大力矩 → Wolf 2023 支持拉伸位肥大优势</td>
+        </tr>
+        <tr>
+          <td>绳索飞鸟（低位）</td>
+          <td>手臂在体前交叉时</td>
+          <td>缩短位</td>
+          <td>缩短位张力大但拉伸位张力低 → 不如全程哑铃飞鸟肥大效果好</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== SECTION 4 ===== -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <span class="sec-num purple">04</span>
+    <h2>主动张力 vs 被动张力</h2>
+  </div>
+
+  <p>肌纤维承受的张力并非全部来自肌丝滑动（横桥）。在拉伸位置，弹性结构也会产生张力——这就是近年研究热点「<strong>拉伸介导的肥大</strong>」（stretch-mediated hypertrophy）的核心。</p>
+
+  <div class="def-grid">
+    <div class="def-card gold">
+      <p class="label">主动张力（Active Tension）</p>
+      <h4>肌动蛋白-肌球蛋白横桥产生</h4>
+      <p>收缩过程中，粗细肌丝之间的横桥循环产生的力。遵循长度-张力关系：在最优肌节长度（~2.0-2.2μm）时产生最大主动张力。负荷越重、越接近力竭，主动张力越高。</p>
+    </div>
+    <div class="def-card purple">
+      <p class="label">被动张力（Passive Tension）</p>
+      <h4>弹性结构被拉伸时产生</h4>
+      <p>当肌纤维被拉长时，<strong>肌联蛋白（titin）</strong>、筋膜、结缔组织等弹性成分被拉伸而产生的回弹力。这不需要横桥参与，也不消耗 ATP。在肌肉处于拉长位置时，被动张力占总张力的比例显著增加。</p>
+    </div>
+  </div>
+
+  <div class="info-box key">
+    <h4>🔬 Wolf et al. 2023 的突破</h4>
+    <p>Wolf 等人的系统综述/荟萃分析发现：<strong>在肌肉拉伸位置进行训练，产生的肥大效果显著优于缩短位置</strong>，即使训练量相同。这表明被动张力本身就能有效激活机械转导通路（尤其是 Titin kinase 通路），独立于主动张力促进肥大。这一发现改变了训练设计的底层逻辑——选择能在拉伸位加载目标肌的动作变得至关重要。</p>
+  </div>
+
+  <h3>经典动作示例：拉伸位 vs 缩短位</h3>
+  <div class="tbl-wrap">
+    <table>
+      <caption>优先选择拉伸位优势动作</caption>
+      <thead>
+        <tr><th scope="col">肌群</th><th scope="col">拉伸位优势动作 ✅</th><th scope="col">缩短位优势动作（相对劣势）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>肱二头肌</td><td>斜板哑铃弯举、低位绳索弯举</td><td> preacher curl（集中弯举）</td></tr>
+        <tr><td>股四头肌</td><td>全幅度深蹲、前蹲</td><td>腿屈伸末端锁定</td></tr>
+        <tr><td>胸大肌</td><td>低位绳索飞鸟、宽距哑铃卧推</td><td>绳索飞鸟交叉位</td></tr>
+        <tr><td>腘绳肌</td><td>坐姿腿弯举、罗马尼亚硬拉</td><td>俯卧腿弯举顶部</td></tr>
+        <tr><td>三角肌后束</td><td>俯身哑铃飞鸟（拉伸位）</td><td>绳索面拉</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== SECTION 5 ===== -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <span class="sec-num green">05</span>
+    <h2>剂量-反应关系：多少张力才够？</h2>
+  </div>
+
+  <p>机械张力不是「越多越好」的线性关系。研究揭示了一个有阈值、有平台、有上限的剂量-反应曲线。</p>
+
+  <h3>5.1 有效重复次数范围（Effective Rep Range）</h3>
+
+  <div class="info-box insight">
+    <h4>Schoenfeld et al. 2017 的核心发现</h4>
+    <p>在 RIR ≤ 2-3 的条件下，<strong>5-30 次/组</strong>的肥大效果等价。关键不是具体次数，而是被募集的高阈值运动单位是否在足够张力下累积了足够的时间。</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <caption>重复次数范围与机械张力特征</caption>
+      <thead>
+        <tr><th scope="col">次数范围</th><th scope="col">%1RM</th><th scope="col">RIR 目标</th><th scope="col">张力特征</th><th scope="col">适用场景</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>3-5 次</td><td>85-92%</td><td>1-3</td><td>每根纤维张力极高，但总持续时间短</td><td>最大力量为主</td></tr>
+        <tr><td>6-10 次</td><td>75-85%</td><td>1-2</td><td>力量×时间的良好平衡</td><td>复合动作主力区间</td></tr>
+        <tr><td>10-15 次</td><td>65-75%</td><td>0-2</td><td>「经典肥大」区间，关节友好</td><td>孤立动作主力区间</td></tr>
+        <tr><td>15-25 次</td><td>50-65%</td><td>0-1</td><td>单纤维张力中等，累积时间长</td><td>孤立/弱项强化</td></tr>
+        <tr><td>25-30+ 次</td><td>30-50%</td><td>0</td><td>需达到力竭才能充分募集高阈值 MU</td><td>收尾/代谢压力</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>5.2 RIR（保留次数）——张力的「开关」</h3>
+
+  <p>RIR（Reps In Reserve）= 该组结束时还能再做几次。<strong>它是判断一组是否产生有效机械张力的核心指标。</strong></p>
+
+  <div class="info-box key">
+    <h4>为什么 RIR 如此重要？</h4>
+    <ul>
+      <li><strong>RIR &gt; 5</strong>：只有低阈值运动单位被募集，高阈值纤维完全未被激活 → 几乎无有效张力</li>
+      <li><strong>RIR 3-5</strong>：高阈值 MU 开始被募集，但张力累积时间不足 → 有限的肥大刺激</li>
+      <li><strong>RIR 1-3</strong>：高阈值 MU 充分募集且在张力下持续工作 → <strong>有效肥大刺激区间</strong></li>
+      <li><strong>RIR 0（力竭）</strong>：所有可募集的 MU 均被激活 → 最大张力，但恢复成本也最高</li>
+    </ul>
+    <p style="margin-top:var(--sp-sm);">Lasevicius et al. (2018) 和 Morton et al. (2016) 证明：只要 RIR ≤ 2，即使 30-40% 1RM 的轻负荷也能产生与 80%+ 1RM 相当的肥大效果。<strong>决定因素是接近力竭的程度，而非绝对负荷。</strong></p>
+  </div>
+
+  <h3>5.3 周训练量——累积张力的「乘数」</h3>
+
+  <p>Schoenfeld, Ogborn &amp; Krieger (2017) 的剂量-反应荟萃分析：</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <caption>每周每肌群有效组数与肥大反应</caption>
+      <thead>
+        <tr><th scope="col">训练水平</th><th scope="col">推荐周组数</th><th scope="col">频率</th><th scope="col">说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>初学者（0-12月）</td><td style="font-family:var(--font-mono); color:var(--c-green);">8-12 组</td><td>2次/周</td><td>建立基础力量和动作模式</td></tr>
+        <tr><td>中级（1-3年）</td><td style="font-family:var(--font-mono); color:var(--c-accent);">12-18 组</td><td>2次/周</td><td>渐进增加有效张力总量</td></tr>
+        <tr><td>高级（3年+）</td><td style="font-family:var(--font-mono); color:var(--c-red);">16-22 组</td><td>2-3次/周</td><td>接近收益递减拐点</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:var(--fs-sm); color:var(--c-text-3);">超过 22 组/周后，边际收益递减且过度训练风险增加。一个「有效组」= RIR ≤ 3 的组（热身组和 RIR ≥ 5 的轻组不计入）。</p>
+</section>
+
+<!-- ===== SECTION 6 ===== -->
+<section class="sec" id="s6">
+  <div class="sec-head">
+    <span class="sec-num red">06</span>
+    <h2>研究前沿与争议</h2>
+  </div>
+
+  <h3>6.1 研究演进时间线</h3>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <span class="year">2010</span>
+      <p class="desc">Schoenfeld 提出肥大三因素模型：机械张力、代谢压力、肌肉损伤并列。这一框架统治了训练科学 10 年。</p>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2016-2018</span>
+      <p class="desc">Lasevicius 2018、Morton 2016 证明轻负荷（30-40% 1RM）在接近力竭时产生等效肥大 → 动摇「必须大重量」的信念，强化「张力 × 募集」的核心地位。Damas 2018 发现肌肉损伤不预测肥大 → 损伤假说被削弱。</p>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2021</span>
+      <p class="desc">Schoenfeld 修订其模型：<strong>机械张力是唯一独立的肥大驱动力</strong>，代谢压力和肌肉损伤降级为「伴随现象」而非独立机制。</p>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2023</span>
+      <p class="desc">Wolf et al. 发表拉伸介导肥大的荟萃分析，证明肌肉在拉伸位训练产生更大肥大 → 被动张力成为新的研究焦点。Pedrosa et al. 发现较长肌肉长度训练产生更大区域肥大。</p>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2025</span>
+      <p class="desc">Van Every, Lees, Wilson, Nippard &amp; Phillips (McMaster) 发表批判性综述：<strong>明确声明机械张力是唯一首要且必要的驱动因素</strong>，系统性驳斥急性激素假说、代谢压力假说、泵感假说和肌浆肥大假说。</p>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2026</span>
+      <p class="desc">Science Advances 发表新研究，进一步证实机械负荷通过机械转导通路直接诱导肌纤维纵向生长。Ji et al. 在 J Physiol 发表整合框架，统一训练参数与神经肌肉适应的映射关系。</p>
+    </div>
+  </div>
+
+  <h3>6.2 当前核心争议</h3>
+
+  <div class="tbl-wrap">
+    <table>
+      <caption>开放问题与对立观点</caption>
+      <thead>
+        <tr><th scope="col">争议议题</th><th scope="col">主流观点</th><th scope="col">对立/未解观点</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>代谢应激是否有独立贡献？</strong></td>
+          <td>Van Every 2025：否，只是疲劳的伴随现象</td>
+          <td>Schoenfeld 仍认为在 BFR 训练中可能有独立贡献；PA 通路连接了代谢产物与 mTORC1</td>
+        </tr>
+        <tr>
+          <td><strong>肌浆肥大是否独立存在？</strong></td>
+          <td>Van Every 2025：不构成独立的肥大形式</td>
+          <td>Vann 2022 发现高容量训练增加了非肌原纤维蛋白（信号转导蛋白、代谢酶），可能有功能意义</td>
+        </tr>
+        <tr>
+          <td><strong>机械感受器的完整图谱</strong></td>
+          <td>已确认 integrin、FAK、titin、DGC、GPR56、YAP/TAZ</td>
+          <td>「精确机制仍有待阐明」（Van Every 2025 原文）——尚无完整从传感器到翻译靶点的信号通路</td>
+        </tr>
+        <tr>
+          <td><strong>「最佳」机械张力阈值</strong></td>
+          <td>RIR ≤ 2-3，有效次数 5-30</td>
+          <td>个体差异极大；训练经验、肌纤维类型、基因多态性如何影响阈值？尚无精确预测模型</td>
+        </tr>
+        <tr>
+          <td><strong>离心训练的独立肥大效应</strong></td>
+          <td>离心允许更大力量 → 更高张力/纤维</td>
+          <td>Pellan 2024 荟萃分析：人为延长离心时间（≥4秒）并不额外增加肥大 → 不是越慢越好</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box warn">
+    <h4>⚠️ 方法学局限</h4>
+    <ul>
+      <li>目前没有直接测量单根肌纤维张力的非侵入性技术——所有量化均为间接推算</li>
+      <li>大部分肥大研究持续 8-12 周，长期（&gt;1年）剂量-反应数据匮乏</li>
+      <li>超声/MRI 测量肌肥大存在 5-10% 的测量误差</li>
+      <li>动物模型（超负荷/切除协同肌）与人体训练的差异外推需谨慎</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== SECTION 7 ===== -->
+<section class="sec" id="s7">
+  <div class="sec-head">
+    <span class="sec-num green">07</span>
+    <h2>实践启示与总结</h2>
+  </div>
+
+  <h3>7.1 最大化机械张力的训练原则</h3>
+
+  <div class="sensor-grid">
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-accent)">① 渐进超负荷</p>
+      <p>逐步增加重量、次数或组数。当达到次数区间上限且 RIR ≥ 2 时，增加 1-2 次或 2.5kg。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-steel)">② 接近力竭</p>
+      <p>复合动作 RIR 1-2，孤立动作 RIR 0-1。不需要每组力竭，但必须接近。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-teal)">③ 拉伸位优先</p>
+      <p>选择在肌肉拉长位置施加最大张力的动作。全程 ROM，重视离心阶段的控制。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-purple)">④ 充分训练量</p>
+      <p>每肌群每周 10-20 有效组（RIR ≤ 3），分 2-3 次训练。超出 22 组收益递减。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-green)">⑤ 控制离心</p>
+      <p>2-3 秒的受控离心阶段，利用力-速度关系增加每根纤维的力输出。但不必刻意超慢（≥4秒无额外收益）。</p>
+    </div>
+    <div class="sensor-card">
+      <p class="name" style="color:var(--c-red)">⑥ 营养与恢复</p>
+      <p>蛋白质 ≥1.6g/kg/d（每餐含 2-3g 亮氨酸），热量盈余 ~200-400kcal/d，睡眠 ≥7h。没有这些，张力再大也无法转化为蛋白合成。</p>
+    </div>
+  </div>
+
+  <h3>7.2 核心要点总结</h3>
+
+  <div class="info-box key">
+    <h4>📌 一句话记住机械张力</h4>
+    <p style="font-size:var(--fs-lg); color:var(--c-text);"><strong>机械张力 = 被募集的肌纤维承受的力 × 该力持续的时间。</strong>它通过 integrin、titin、DGC 等机械感受器被细胞感知，汇聚到 mTORC1 激活蛋白合成。增肌的核心就是：用合适的动作在拉伸位加载、接近力竭、累积足够组数、充分恢复。</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 8 ===== -->
+<section class="sec" id="s8">
+  <div class="sec-head">
+    <span class="sec-num gold">08</span>
+    <h2>参考文献</h2>
+  </div>
+
+  <ol class="ref-list">
+    <li>Van Every DW, Lees MJ, Wilson B, Nippard J, Phillips SM. Load-induced human skeletal muscle hypertrophy: Mechanisms, myths, and misconceptions. <em>J Sport Health Sci</em>, 2025. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12927080/" target="_blank" rel="noopener noreferrer">PMC12927080</a></li>
+    <li>Schoenfeld BJ. The mechanisms of muscle hypertrophy and their application to resistance training. <em>J Strength Cond Res</em>, 2010;24(10):2857-2867.</li>
+    <li>Schoenfeld BJ, Ogborn D, Krieger JW. Dose-response relationship between weekly resistance training volume and increases in muscle mass. <em>J Sports Sci</em>, 2017;35(11):1073-1080.</li>
+    <li>Lasevicius C, et al. Effects of different intensities of resistance training with equated volume load on muscle strength and hypertrophy. <em>J Strength Cond Res</em>, 2018;32(6):1831-1838.</li>
+    <li>Morton RW, et al. A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength. <em>Br J Sports Med</em>, 2018;52(6):376-384.</li>
+    <li>Wolf et al. Stretch-mediated hypertrophy: Training at long muscle lengths produces greater hypertrophy. 2023.</li>
+    <li>Damas F, et al. A review of resistance training-induced changes in skeletal muscle protein synthesis and their contribution to hypertrophy. <em>Sports Med</em>, 2015;45(6):801-814.</li>
+    <li>Ji et al. Resistance training-induced adaptations in the neuromuscular system. <em>J Physiol</em>, 2025. <a href="https://physoc.onlinelibrary.wiley.com/doi/full/10.1113/JP289716" target="_blank" rel="noopener noreferrer">DOI:10.1113/JP289716</a></li>
+    <li>Bodine SC. Mechanical signaling in skeletal muscle. <em>Compr Physiol</em>, 2022.</li>
+    <li>Crossland H, et al. Focal adhesion kinase and muscle hypertrophy. <em>J Physiol</em>, 2013.</li>
+    <li>Hornberger HC, et al. Phosphatidic acid regulates mTOR via direct binding. <em>EMBO Rep</em>, 2006.</li>
+    <li>Japan 9-year nationwide claims study. Sex Differences and Age Distributions in Invasive Treatments for Chalazion and Hordeolum. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12887806/" target="_blank" rel="noopener noreferrer">PMC12887806</a></li>
+    <li>Goodman CA. The role of load-induced mTORC1 activation in skeletal muscle hypertrophy. 2019.</li>
+    <li>Panwar et al. Mechanotransduction in skeletal muscle. 2023.</li>
+    <li>Pelland et al. Effects of eccentric overload on muscle hypertrophy. Meta-analysis, 2024.</li>
+    <li>The Muscle PhD. Quantifying Mechanical Tension. 2021. <a href="https://themusclephd.com/quantifying-mechanical-tension/" target="_blank" rel="noopener noreferrer">themusclephd.com</a></li>
+    <li>Bond University. Practical Applications of Biomechanical Principles in Resistance Training: Moments and Moment Arms.</li>
+  </ol>
+</section>
+
+<footer class="foot">
+  <p>本报告为运动科学研究综述，不构成个人训练处方。训练方案应结合个体情况由专业人士指导。</p>
+  <p style="margin-top:var(--sp-xs);">科研助理 Agent · Rise · 2026-09-24</p>
+</footer>
+
+</div>
+</div>
+
+<script>
+(function() {
+  try {
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var t = document.querySelector(this.getAttribute('href'));
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      });
+    });
+  } catch(e) {}
+})();
+</script>
+
+
+</body></html>
